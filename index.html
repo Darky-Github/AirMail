@@ -1,40 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AirMail is a simple, fast, temporary email generator with inbox viewing and expiry timer.">
-  <meta name="keywords" content="temporary email, temp mail, disposable email, inbox, AirMail, 10 minute mail, airmail temp email">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="author" content="Darky-Github">
-  <title>AirMail - Temporary Email</title>
+  <meta name="description" content="AirMail - A temporary email generator with custom API support.">
+  <meta name="keywords" content="temporary email, temp mail, disposable email, API, AirMail, Darky, hacking tools">
+  <title>AirMail</title>
   <link rel="stylesheet" href="Style/style.css">
 </head>
 <body>
   <div class="container">
-    <h1>📮 AirMail</h1>
+    <h1>AirMail</h1>
 
     <div class="config">
-      <input type="text" id="apiBaseUrl" placeholder="API Base URL">
-      <input type="text" id="apiKey" placeholder="API Key (or type NO_API_KEY)">
-      <button onclick="initService()">Initialize Service</button>
+      <input type="text" id="apiBase" placeholder="API Base URL" />
+      <input type="text" id="apiKey" placeholder="API Key (or NO_API_KEY)" />
+      <button onclick="setupAPI()">Set API</button>
     </div>
 
     <div class="email-box">
-      <button onclick="generateEmail()">🎲 Generate Email</button>
-      <input type="text" id="emailDisplay" readonly>
-      <button onclick="copyEmail()">📋 Copy</button>
-      <button onclick="resetTimer()">⏱ Reset Timer</button>
+      <p><strong>Email:</strong> <span id="emailDisplay">-</span></p>
+      <button onclick="copyEmail()">Copy</button>
+      <button onclick="resetTimer()">Reset Timer</button>
+      <p id="timer">Timer: 10:00</p>
     </div>
 
-    <div id="timer">Expires in: 10:00</div>
-    <button onclick="refreshInbox()">🔄 Refresh Inbox</button>
+    <button onclick="refreshInbox()">Refresh Inbox</button>
 
-    <div id="emails">No emails yet.</div>
+    <div id="emails"></div>
     <div id="emailContent"></div>
   </div>
 
   <footer>
-    © <span id="year"></span> AirMail by Darky-Github. All rights reserved.
+    &copy; 2025 Darky-Github. All rights reserved.
   </footer>
 
   <script src="Script/script.js"></script>
