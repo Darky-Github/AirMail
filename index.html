@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AirMail - Temp Email</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>📧 AirMail</h1>
+    <p><strong>Email:</strong> <span id="email">-</span></p>
+    <p><strong>Timer:</strong> <span id="timer">10:00</span></p>
+
+    <div class="btn-group">
+      <button onclick="generateEmail()">Generate New Email</button>
+      <button onclick="copyEmail()">Copy Email</button>
+      <button onclick="resetTimer()">Reset Timer</button>
+      <button onclick="refreshInbox()">Refresh Inbox</button>
+    </div>
+
+    <div id="inbox">
+      <h3>Inbox</h3>
+      <div id="emails">No emails yet.</div>
+    </div>
+
+    <div id="emailContent"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
