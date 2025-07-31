@@ -1,59 +1,65 @@
 let username = "";
 let domain = "1secmail.com";
-let timer;
-let countdown = 600;
-let inboxInterval;
+let emailTimer;
+let timeLeft = 600;
+let apiUrl = "";
+let apiKey = "";
+
+function initService() {
+  apiUrl = document.getElementById("apiBaseUrl").value.trim();
+  apiKey = document.getElementById("apiKey").value.trim();
+  if (!apiUrl) return alert("Please enter an API Base URL");
+  alert("Service initialized! Now generate your email.");
+}
 
 function generateEmail() {
-  clearInterval(inboxInterval);
   username = Math.random().toString(36).substring(2, 10);
-  document.getElementById("email").textContent = `${username}@${domain}`;
+  const email = `${username}@${domain}`;
+  document.getElementById("emailDisplay").value = email;
   resetTimer();
   refreshInbox();
-  inboxInterval = setInterval(refreshInbox, 5000);
 }
 
 function copyEmail() {
-  const emailText = document.getElementById("email").textContent;
-  navigator.clipboard.writeText(emailText)
-    .then(() => alert("Email copied to clipboard!"))
-    .catch(() => alert("Failed to copy email."));
+  const emailInput = document.getElementById("emailDisplay");
+  emailInput.select();
+  document.execCommand("copy");
+  alert("Email copied!");
 }
 
 function resetTimer() {
-  clearInterval(timer);
-  countdown = 600;
+  clearInterval(emailTimer);
+  timeLeft = 600;
   updateTimer();
-  timer = setInterval(() => {
-    countdown--;
+  emailTimer = setInterval(() => {
+    timeLeft--;
     updateTimer();
-    if (countdown <= 0) {
-      clearInterval(timer);
-      clearInterval(inboxInterval);
-      alert("Email expired.");
-      document.getElementById("email").textContent = "-";
-      document.getElementById("emails").innerHTML = "No emails.";
-      document.getElementById("emailContent").textContent = "";
+    if (timeLeft <= 0) {
+      clearInterval(emailTimer);
+      document.getElementById("emailDisplay").value = "Expired";
+      document.getElementById("emails").innerHTML = "Email expired.";
     }
   }, 1000);
 }
 
 function updateTimer() {
-  let mins = String(Math.floor(countdown / 60)).padStart(2, '0');
-  let secs = String(countdown % 60).padStart(2, '0');
-  document.getElementById("timer").textContent = `${mins}:${secs}`;
+  const mins = Math.floor(timeLeft / 60).toString().padStart(2, "0");
+  const secs = (timeLeft % 60).toString().padStart(2, "0");
+  document.getElementById("timer").textContent = `Expires in: ${mins}:${secs}`;
 }
 
 async function refreshInbox() {
-  if (!username) return;
+  if (!username || !apiUrl) return;
+  const inboxURL = `${apiUrl}?action=getMessages&login=${username}&domain=${domain}`;
   try {
-    const url = `https://www.1secmail.com/api/v1/?action=getMessages&login=${username}&domain=${domain}`;
-    const res = await fetch(url);
+    const res = await fetch(inboxURL, {
+      headers: apiKey !== "NO_API_KEY" ? { 'Authorization': apiKey } : {}
+    });
     const data = await res.json();
     const emailsDiv = document.getElementById("emails");
     emailsDiv.innerHTML = "";
 
-    if (data.length === 0) {
+    if (!Array.isArray(data) || data.length === 0) {
       emailsDiv.innerHTML = "No emails yet.";
       return;
     }
@@ -65,26 +71,30 @@ async function refreshInbox() {
       div.onclick = () => loadEmail(msg.id);
       emailsDiv.appendChild(div);
     });
-  } catch (error) {
-    console.error("Failed to fetch inbox:", error);
+  } catch (err) {
     document.getElementById("emails").innerHTML = "Error loading inbox.";
+    console.error("Inbox error:", err);
   }
 }
 
 async function loadEmail(id) {
+  if (!username || !apiUrl) return;
+  const readURL = `${apiUrl}?action=readMessage&login=${username}&domain=${domain}&id=${id}`;
   try {
-    const url = `https://www.1secmail.com/api/v1/?action=readMessage&login=${username}&domain=${domain}&id=${id}`;
-    const res = await fetch(url);
+    const res = await fetch(readURL, {
+      headers: apiKey !== "NO_API_KEY" ? { 'Authorization': apiKey } : {}
+    });
     const data = await res.json();
     document.getElementById("emailContent").innerHTML = `
       <h4>${data.subject}</h4>
       <p><strong>From:</strong> ${data.from}</p>
       <div>${data.text || data.html || "(No content)"}</div>
     `;
-  } catch (error) {
-    console.error("Failed to read message:", error);
-    document.getElementById("emailContent").textContent = "Error loading message.";
+  } catch (err) {
+    document.getElementById("emailContent").innerHTML = "Error loading message.";
+    console.error("Read error:", err);
   }
 }
 
-window.onload = generateEmail;
+// Set year in footer
+document.getElementById("year").textContent = new Date().getFullYear();
