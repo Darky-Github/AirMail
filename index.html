@@ -2,12 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>AirMail - Temp Email</title>
+  <meta name="description" content="AirMail is a simple, fast, temporary email generator with inbox viewing and expiry timer.">
+  <meta name="keywords" content="temporary email, temp mail, disposable email, inbox, AirMail, 10 minute mail, airmail temp email">
+  <meta name="author" content="Darky-Github">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AirMail - Temporary Email</title>
   <link rel="stylesheet" href="Style/style.css">
 </head>
 <body>
   <div class="container">
-    <h1>📧 AirMail</h1>
+    <h1>AirMail</h1>
     <p><strong>Email:</strong> <span id="email">-</span></p>
     <p><strong>Timer:</strong> <span id="timer">10:00</span></p>
 
@@ -20,12 +24,19 @@
 
     <div id="inbox">
       <h3>Inbox</h3>
-      <div id="emails">No emails yet.</div>
+      <div id="emails">No emails yet</div>
     </div>
 
     <div id="emailContent"></div>
   </div>
 
   <script src="Script/script.js"></script>
+  <footer style="text-align:center; margin-top: 30px; font-size: 14px; color: #aaa;">
+  © <span id="year"></span> AirMail by Darky-Github. All rights reserved.
+  </footer>
+  <script>
+    // Auto-update year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
