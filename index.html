@@ -2,41 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="AirMail is a simple, fast, temporary email generator with inbox viewing and expiry timer.">
   <meta name="keywords" content="temporary email, temp mail, disposable email, inbox, AirMail, 10 minute mail, airmail temp email">
   <meta name="author" content="Darky-Github">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AirMail - Temporary Email</title>
-  <link rel="stylesheet" href="Style/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>AirMail</h1>
-    <p><strong>Email:</strong> <span id="email">-</span></p>
-    <p><strong>Timer:</strong> <span id="timer">10:00</span></p>
+    <h1>📮 AirMail</h1>
 
-    <div class="btn-group">
-      <button onclick="generateEmail()">Generate New Email</button>
-      <button onclick="copyEmail()">Copy Email</button>
-      <button onclick="resetTimer()">Reset Timer</button>
-      <button onclick="refreshInbox()">Refresh Inbox</button>
+    <div class="config">
+      <input type="text" id="apiBaseUrl" placeholder="API Base URL">
+      <input type="text" id="apiKey" placeholder="API Key (or type NO_API_KEY)">
+      <button onclick="initService()">Initialize Service</button>
     </div>
 
-    <div id="inbox">
-      <h3>Inbox</h3>
-      <div id="emails">No emails yet</div>
+    <div class="email-box">
+      <button onclick="generateEmail()">🎲 Generate Email</button>
+      <input type="text" id="emailDisplay" readonly>
+      <button onclick="copyEmail()">📋 Copy</button>
+      <button onclick="resetTimer()">⏱ Reset Timer</button>
     </div>
 
+    <div id="timer">Expires in: 10:00</div>
+    <button onclick="refreshInbox()">🔄 Refresh Inbox</button>
+
+    <div id="emails">No emails yet.</div>
     <div id="emailContent"></div>
   </div>
 
-  <script src="Script/script.js"></script>
-  <footer style="text-align:center; margin-top: 30px; font-size: 14px; color: #aaa;">
-  © <span id="year"></span> AirMail by Darky-Github. All rights reserved.
+  <footer>
+    © <span id="year"></span> AirMail by Darky-Github. All rights reserved.
   </footer>
-  <script>
-    // Auto-update year
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+
+  <script src="script.js"></script>
 </body>
 </html>
