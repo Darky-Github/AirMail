@@ -3,6 +3,7 @@ let apiKey = "";
 let token = "";
 let email = "";
 let password = "";
+let userId = "";
 let timer = 600;
 let timerInterval;
 
@@ -14,6 +15,7 @@ function generateRandom(length = 10) {
 function setupAPI() {
   apiBase = document.getElementById("apiBase").value;
   apiKey = document.getElementById("apiKey").value;
+  destroySession(); // Clear any existing session
   startSession();
 }
 
@@ -24,12 +26,19 @@ async function startSession() {
     email = `${generateRandom()}@${domainName}`;
     password = generateRandom(12);
 
-    await fetch(`${apiBase}/accounts`, {
+    // Create account
+    const reg = await fetch(`${apiBase}/accounts`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ address: email, password }),
-    }).catch(() => {}); // Ignore if already exists
+    }).catch(() => {});
 
+    if (reg?.status === 201) {
+      const regData = await reg.json();
+      userId = regData.id;
+    }
+
+    // Login
     const login = await fetch(`${apiBase}/token`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -43,8 +52,7 @@ async function startSession() {
     startTimer();
     refreshInbox();
   } else {
-    // fallback for other APIs (you can define how to handle them)
-    alert("Currently only Mail.tm is supported properly.");
+    alert("Only Mail.tm supported for session deletion.");
   }
 }
 
@@ -54,8 +62,9 @@ function startTimer() {
   timerInterval = setInterval(() => {
     timer--;
     if (timer <= 0) {
-      clearInterval(timerInterval);
       document.getElementById("timer").textContent = "Expired";
+      clearInterval(timerInterval);
+      destroySession();
     } else {
       const m = Math.floor(timer / 60).toString().padStart(2, '0');
       const s = (timer % 60).toString().padStart(2, '0');
@@ -65,13 +74,16 @@ function startTimer() {
 }
 
 function resetTimer() {
-  startTimer();
+  timer = 600;
+}
+
+function extendTimer() {
+  timer += 1800; // +30 min
 }
 
 function copyEmail() {
-  navigator.clipboard.writeText(email).then(() => {
-    alert("Email copied to clipboard!");
-  });
+  if (email)
+    navigator.clipboard.writeText(email).then(() => alert("Email copied to clipboard!"));
 }
 
 async function refreshInbox() {
@@ -105,3 +117,28 @@ async function loadEmail(id) {
     <p>${data.text}</p>
   `;
 }
+
+async function destroySession() {
+  clearInterval(timerInterval);
+  document.getElementById("emailDisplay").textContent = "-";
+  document.getElementById("timer").textContent = "Expired";
+  document.getElementById("emails").innerHTML = "";
+  document.getElementById("emailContent").innerHTML = "";
+
+  if (token && userId && apiBase.includes("mail.tm")) {
+    await fetch(`${apiBase}/accounts/${userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).catch(() => {});
+  }
+
+  token = "";
+  email = "";
+  password = "";
+  userId = "";
+}
+
+// Cleanup when page is closed or reloaded
+window.addEventListener("beforeunload", destroySession);
