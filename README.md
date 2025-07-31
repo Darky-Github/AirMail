@@ -1,6 +1,7 @@
 # AirMail - Temporary Email
 
 AirMail is a lightweight temporary email generator and inbox viewer built using pure HTML, CSS, and JavaScript. No backend. No database. Fully privacy-respecting and user-controlled.
+(AirMail)[Darky-Github.github.io/AirMail]
 
 ---
 
