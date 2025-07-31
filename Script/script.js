@@ -1,100 +1,107 @@
-let username = "";
-let domain = "1secmail.com";
-let emailTimer;
-let timeLeft = 600;
-let apiUrl = "";
+let apiBase = "";
 let apiKey = "";
+let token = "";
+let email = "";
+let password = "";
+let timer = 600;
+let timerInterval;
 
-function initService() {
-  apiUrl = document.getElementById("apiBaseUrl").value.trim();
-  apiKey = document.getElementById("apiKey").value.trim();
-  if (!apiUrl) return alert("Please enter an API Base URL");
-  alert("Service initialized! Now generate your email.");
+function generateRandom(length = 10) {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
-function generateEmail() {
-  username = Math.random().toString(36).substring(2, 10);
-  const email = `${username}@${domain}`;
-  document.getElementById("emailDisplay").value = email;
-  resetTimer();
-  refreshInbox();
+function setupAPI() {
+  apiBase = document.getElementById("apiBase").value;
+  apiKey = document.getElementById("apiKey").value;
+  startSession();
 }
 
-function copyEmail() {
-  const emailInput = document.getElementById("emailDisplay");
-  emailInput.select();
-  document.execCommand("copy");
-  alert("Email copied!");
+async function startSession() {
+  if (apiBase.includes("mail.tm")) {
+    const domain = await (await fetch(`${apiBase}/domains`)).json();
+    const domainName = domain["hydra:member"][0].domain;
+    email = `${generateRandom()}@${domainName}`;
+    password = generateRandom(12);
+
+    await fetch(`${apiBase}/accounts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ address: email, password }),
+    }).catch(() => {}); // Ignore if already exists
+
+    const login = await fetch(`${apiBase}/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ address: email, password }),
+    });
+
+    const loginData = await login.json();
+    token = loginData.token;
+
+    document.getElementById("emailDisplay").textContent = email;
+    startTimer();
+    refreshInbox();
+  } else {
+    // fallback for other APIs (you can define how to handle them)
+    alert("Currently only Mail.tm is supported properly.");
+  }
 }
 
-function resetTimer() {
-  clearInterval(emailTimer);
-  timeLeft = 600;
-  updateTimer();
-  emailTimer = setInterval(() => {
-    timeLeft--;
-    updateTimer();
-    if (timeLeft <= 0) {
-      clearInterval(emailTimer);
-      document.getElementById("emailDisplay").value = "Expired";
-      document.getElementById("emails").innerHTML = "Email expired.";
+function startTimer() {
+  timer = 600;
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timer--;
+    if (timer <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById("timer").textContent = "Expired";
+    } else {
+      const m = Math.floor(timer / 60).toString().padStart(2, '0');
+      const s = (timer % 60).toString().padStart(2, '0');
+      document.getElementById("timer").textContent = `Timer: ${m}:${s}`;
     }
   }, 1000);
 }
 
-function updateTimer() {
-  const mins = Math.floor(timeLeft / 60).toString().padStart(2, "0");
-  const secs = (timeLeft % 60).toString().padStart(2, "0");
-  document.getElementById("timer").textContent = `Expires in: ${mins}:${secs}`;
+function resetTimer() {
+  startTimer();
+}
+
+function copyEmail() {
+  navigator.clipboard.writeText(email).then(() => {
+    alert("Email copied to clipboard!");
+  });
 }
 
 async function refreshInbox() {
-  if (!username || !apiUrl) return;
-  const inboxURL = `${apiUrl}?action=getMessages&login=${username}&domain=${domain}`;
-  try {
-    const res = await fetch(inboxURL, {
-      headers: apiKey !== "NO_API_KEY" ? { 'Authorization': apiKey } : {}
-    });
-    const data = await res.json();
-    const emailsDiv = document.getElementById("emails");
-    emailsDiv.innerHTML = "";
+  if (!token || !apiBase.includes("mail.tm")) return;
 
-    if (!Array.isArray(data) || data.length === 0) {
-      emailsDiv.innerHTML = "No emails yet.";
-      return;
-    }
+  const res = await fetch(`${apiBase}/messages`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  const emailsDiv = document.getElementById("emails");
+  emailsDiv.innerHTML = "";
 
-    data.forEach(msg => {
-      const div = document.createElement("div");
-      div.className = "email";
-      div.textContent = `📩 ${msg.from} - ${msg.subject}`;
-      div.onclick = () => loadEmail(msg.id);
-      emailsDiv.appendChild(div);
-    });
-  } catch (err) {
-    document.getElementById("emails").innerHTML = "Error loading inbox.";
-    console.error("Inbox error:", err);
-  }
+  data["hydra:member"].forEach(msg => {
+    const div = document.createElement("div");
+    div.className = "email";
+    div.textContent = `📧 ${msg.from.address} - ${msg.subject}`;
+    div.onclick = () => loadEmail(msg.id);
+    emailsDiv.appendChild(div);
+  });
 }
 
 async function loadEmail(id) {
-  if (!username || !apiUrl) return;
-  const readURL = `${apiUrl}?action=readMessage&login=${username}&domain=${domain}&id=${id}`;
-  try {
-    const res = await fetch(readURL, {
-      headers: apiKey !== "NO_API_KEY" ? { 'Authorization': apiKey } : {}
-    });
-    const data = await res.json();
-    document.getElementById("emailContent").innerHTML = `
-      <h4>${data.subject}</h4>
-      <p><strong>From:</strong> ${data.from}</p>
-      <div>${data.text || data.html || "(No content)"}</div>
-    `;
-  } catch (err) {
-    document.getElementById("emailContent").innerHTML = "Error loading message.";
-    console.error("Read error:", err);
-  }
+  const res = await fetch(`${apiBase}/messages/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+  const contentDiv = document.getElementById("emailContent");
+  contentDiv.innerHTML = `
+    <h3>${data.subject}</h3>
+    <p><strong>From:</strong> ${data.from.address}</p>
+    <p>${data.text}</p>
+  `;
 }
-
-// Set year in footer
-document.getElementById("year").textContent = new Date().getFullYear();
