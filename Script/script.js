@@ -1,112 +1,93 @@
-let email = "";
-let domain = "";
-let timer;
+let email = "", domain = "mail.tm", token = "", timerInterval;
 let remaining = 600;
 
+const emailBox = document.getElementById("email");
+const timerText = document.getElementById("timer");
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60).toString().padStart(2, '0');
+  const s = (sec % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
 function startTimer() {
-  clearInterval(timer);
-  timer = setInterval(() => {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
     remaining--;
+    timerText.textContent = formatTime(remaining);
+    document.title = `(${formatTime(remaining)}) AirMail`;
     if (remaining <= 0) {
+      clearInterval(timerInterval);
       destroySession();
-      clearInterval(timer);
     }
   }, 1000);
 }
 
-function updateEmailField() {
-  document.getElementById("email").value = `${email}@${domain}`;
-}
-
 function destroySession() {
   email = "";
-  domain = "";
-  document.getElementById("email").value = "";
+  token = "";
+  emailBox.value = "";
   document.getElementById("emails").innerHTML = "";
   document.getElementById("emailContent").innerHTML = "";
-  remaining = 600;
-  clearInterval(timer);
+  timerText.textContent = "00:00";
+  document.title = "AirMail";
 }
 
 function generateEmail() {
-  const chars = "abcdefghijklmnopqrstuvwxyz1234567890";
-  email = "";
-  for (let i = 0; i < 8; i++) {
-    email += chars[Math.floor(Math.random() * chars.length)];
-  }
-  domain = "1secmail.com"; // or adjust as needed
-  updateEmailField();
+  const len = parseInt(document.getElementById("char-length").value) || 8;
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  email = Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  emailBox.value = email + "@mail.tm";
   remaining = 600;
+  timerText.textContent = formatTime(remaining);
   startTimer();
   fetchInbox();
 }
 
-function copyEmail() {
-  const input = document.getElementById("email");
-  input.select();
-  document.execCommand("copy");
-}
-
-function resetTimer() {
-  remaining = 600;
-}
-
-function extendTimer() {
-  remaining += 1800;
-}
-
 function fetchInbox() {
-  if (!email || !domain) return;
-  const apiUrl = document.getElementById("api-url").value.trim();
-  const apiKey = document.getElementById("api-key").value.trim();
-  const fullUrl = `${apiUrl}?action=getMessages&login=${email}&domain=${domain}`;
+  const api = document.getElementById("api-url").value || "https://api.mail.tm";
+  const key = document.getElementById("api-key").value || "NO_API_KEY";
+  const inbox = document.getElementById("emails");
+  inbox.innerHTML = "Loading...";
 
-  fetch(fullUrl, {
-    headers: apiKey !== "NO_API_KEY" ? { "Authorization": `Bearer ${apiKey}` } : {}
+  // This is just placeholder logic; actual Mail.tm needs account creation + token
+  fetch(`${api}/messages`, {
+    headers: key !== "NO_API_KEY" ? { Authorization: `Bearer ${key}` } : {}
   })
-    .then(res => res.json())
-    .then(data => {
-      const inbox = document.getElementById("emails");
-      inbox.innerHTML = "";
-      if (!Array.isArray(data)) return;
-      data.forEach(msg => {
-        const div = document.createElement("div");
-        div.className = "email";
-        div.innerText = `${msg.from}: ${msg.subject}`;
-        div.onclick = () => loadMessage(msg.id);
-        inbox.appendChild(div);
-      });
-    })
-    .catch(() => {
-      document.getElementById("emails").innerHTML = "Error loading inbox.";
+  .then(res => res.json())
+  .then(data => {
+    inbox.innerHTML = "";
+    (data || []).forEach(msg => {
+      const div = document.createElement("div");
+      div.className = "email";
+      div.textContent = `${msg.from.address} — ${msg.subject}`;
+      div.onclick = () => loadEmail(api, msg.id, key);
+      inbox.appendChild(div);
     });
+  }).catch(() => inbox.innerHTML = "Inbox fetch error");
 }
 
-function loadMessage(id) {
-  const apiUrl = document.getElementById("api-url").value.trim();
-  const apiKey = document.getElementById("api-key").value.trim();
-  const fullUrl = `${apiUrl}?action=readMessage&login=${email}&domain=${domain}&id=${id}`;
-
-  fetch(fullUrl, {
-    headers: apiKey !== "NO_API_KEY" ? { "Authorization": `Bearer ${apiKey}` } : {}
+function loadEmail(api, id, key) {
+  fetch(`${api}/messages/${id}`, {
+    headers: key !== "NO_API_KEY" ? { Authorization: `Bearer ${key}` } : {}
   })
-    .then(res => res.json())
-    .then(data => {
-      document.getElementById("emailContent").innerHTML = `
-        <strong>From:</strong> ${data.from}<br />
-        <strong>Subject:</strong> ${data.subject}<br />
-        <strong>Date:</strong> ${data.date}<br /><br />
-        <div>${data.body}</div>
-      `;
-    })
-    .catch(() => {
-      document.getElementById("emailContent").innerHTML = "Error loading message.";
-    });
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("emailContent").innerHTML = `
+      <b>From:</b> ${data.from.address}<br/>
+      <b>Subject:</b> ${data.subject}<br/>
+      <b>Date:</b> ${data.intro}<br/><hr/>
+      ${data.text || data.html}
+    `;
+  });
 }
 
-document.getElementById("copy").onclick = copyEmail;
 document.getElementById("generate").onclick = generateEmail;
-document.getElementById("reset").onclick = resetTimer;
-document.getElementById("extend").onclick = extendTimer;
+document.getElementById("reset").onclick = () => remaining = 600;
+document.getElementById("extend").onclick = () => remaining += 1800;
 document.getElementById("destroy").onclick = destroySession;
+document.getElementById("copy").onclick = () => {
+  emailBox.select();
+  document.execCommand("copy");
+};
 document.getElementById("refresh").onclick = fetchInbox;
