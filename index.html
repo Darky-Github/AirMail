@@ -14,8 +14,14 @@
     <h1>AirMail</h1>
 
     <div class="config">
+      <label>Char Length</label>
       <input type="number" id="char-length" min="4" max="32" value="8" />
-      <label for="char-length">Char Length</label>
+
+      <label>Custom API</label>
+      <input type="text" id="custom-api" placeholder="https://your.api/send" />
+
+      <label>API Key</label>
+      <input type="text" id="api-key" placeholder="NO_API_KEY" />
     </div>
 
     <div class="email-box">
@@ -36,6 +42,15 @@
       <button id="refresh">Refresh</button>
       <div id="emails"></div>
       <div id="emailContent"></div>
+    </div>
+
+    <div class="send-email">
+      <h2>Send Email</h2>
+      <input type="text" id="to-email" placeholder="To Email" />
+      <input type="text" id="subject" placeholder="Subject" />
+      <textarea id="message" placeholder="Message..."></textarea>
+      <button id="send">Send</button>
+      <div id="send-status"></div>
     </div>
   </div>
 
