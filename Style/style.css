@@ -1,82 +1,86 @@
 body {
-  font-family: sans-serif;
-  background: #121212;
   margin: 0;
   padding: 0;
+  background: #121212;
+  font-family: Arial, sans-serif;
+  color: #eee;
   text-align: center;
-  color: white;
 }
 
 .container {
-  margin: auto;
   max-width: 600px;
+  margin: 30px auto;
   padding: 20px;
-  background: black;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  background: #1a1a1a;
   border-radius: 10px;
-  margin-top: 40px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
 }
 
 h1, h2 {
-  color: #ccc;
+  margin: 10px 0;
+  color: #fafafa;
 }
 
-.email-box,
-.config {
-  margin-top: 20px;
-}
-
-input[type="text"] {
-  width: 70%;
+input[type="text"],
+input[type="number"] {
+  width: 80%;
   padding: 10px;
   margin: 5px 0;
   background: #222;
+  color: #fff;
   border: 1px solid #444;
-  color: white;
+  border-radius: 5px;
 }
 
 button {
-  padding: 10px 15px;
-  margin: 5px;
+  padding: 10px 12px;
+  margin: 5px 4px;
   border: none;
   border-radius: 5px;
-  background-color: #444;
+  background: #444;
   color: white;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 button:hover {
-  background-color: #666;
+  background: #666;
 }
 
-#emails {
-  margin-top: 20px;
-  text-align: left;
-  max-height: 200px;
-  overflow-y: auto;
+.timer {
+  margin: 15px 0;
+  font-weight: bold;
+  font-size: 1.2em;
 }
 
 .email {
   padding: 10px;
   border-bottom: 1px solid #333;
   cursor: pointer;
+  text-align: left;
 }
 
 .email:hover {
-  background-color: #1c1c1c;
+  background: #222;
 }
 
 #emailContent {
-  margin-top: 20px;
   text-align: left;
   background: #1e1e1e;
   padding: 10px;
+  margin-top: 10px;
   border-radius: 5px;
 }
 
 footer {
-  text-align: center;
-  margin-top: 50px;
-  font-size: 14px;
-  color: #aaa;
+  margin-top: 40px;
+  font-size: 13px;
+  color: #777;
+}
+
+@media (max-width: 600px) {
+  input, button {
+    width: 90%;
+    margin: 5px auto;
+  }
 }
