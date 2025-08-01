@@ -1,48 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="keywords" content="temporary email, AirMail, tempmail, disposable email, anonymous email">
-  <meta name="description" content="AirMail: A customizable frontend for temporary email services.">
-  <meta name="author" content="Darky-Github">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="keywords" content="temporary email, AirMail, tempmail, disposable email, anonymous email" />
+  <meta name="description" content="AirMail: A customizable frontend for temporary email services." />
+  <meta name="author" content="Darky-Github" />
   <title>AirMail</title>
-  <link rel="stylesheet" href="Style/style.css">
+  <link rel="stylesheet" href="Style/style.css" />
 </head>
 <body>
   <div id="settings-icon">⚙️</div>
-  <div id="settings-panel" class="hidden">
+
+  <div id="overlay" class="hidden"></div>
+  <div id="settings-modal" class="hidden">
     <h2>Settings</h2>
-    <label>Theme:
+
+    <label>Theme:<br />
       <select id="theme-selector">
         <option value="dark">Dark</option>
         <option value="light">Light</option>
         <option value="hacker">Hacker</option>
       </select>
-    </label>
-    <label>Font Size:
-      <input type="range" id="font-size" min="12" max="24" value="16">
-    </label>
-    <label>Username Length:
-      <input type="number" id="username-length" min="4" max="32" value="8">
-    </label>
-    <label>Allowed Characters:
-      <input type="text" id="charset" value="abcdefghijklmnopqrstuvwxyz1234567890">
-    </label>
-    <label>Encoding:
+    </label><br />
+
+    <label>Font Size:<br />
+      <input type="range" id="font-size" min="12" max="24" value="16" />
+    </label><br />
+
+    <label>Username Length:<br />
+      <input type="number" id="username-length" min="4" max="32" value="8" />
+    </label><br />
+
+    <label>Allowed Characters:<br />
+      <input type="text" id="charset" value="abcdefghijklmnopqrstuvwxyz1234567890" />
+    </label><br />
+
+    <label>Encoding:<br />
       <select id="encoding">
         <option value="utf-8">UTF-8</option>
         <option value="ascii">ASCII</option>
         <option value="utf-16">UTF-16</option>
       </select>
-    </label>
+    </label><br />
+
+    <label>API URL:<br />
+      <input type="text" id="api-url" placeholder="https://example.com/api" />
+    </label><br />
+
+    <label>API Key:<br />
+      <input type="text" id="api-key" placeholder="Your API key or NO_API_KEY" />
+    </label><br />
+
     <button id="export-inbox">Export Inbox</button>
+    <button id="close-settings">Close</button>
   </div>
 
   <div class="container">
     <h1>AirMail</h1>
     <div class="email-box">
-      <input type="text" id="email" readonly>
+      <input type="text" id="email" readonly />
       <button id="copy">Copy</button>
       <button id="generate">Generate Email</button>
       <button id="reset">Reset Timer</button>
@@ -50,7 +67,7 @@
     </div>
     <div class="inbox">
       <h2>Inbox</h2>
-      <input type="text" id="search" placeholder="Search inbox...">
+      <input type="text" id="search" placeholder="Search inbox..." />
       <div id="emails"></div>
       <div id="emailContent"></div>
     </div>
