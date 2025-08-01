@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AirMail</title>
-  <meta name="keywords" content="temporary email, airmail, tempmail, disposable email, privacy" />
-  <meta name="description" content="AirMail - Fast, lightweight temporary email frontend." />
+  <meta name="keywords" content="temporary email, tempmail, disposable, airmail" />
+  <meta name="description" content="AirMail - Lightweight temporary email frontend with custom API support." />
   <meta name="author" content="Darky-Github" />
   <link rel="stylesheet" href="Style/style.css" />
 </head>
@@ -14,22 +14,28 @@
     <h1>AirMail</h1>
 
     <div class="config">
-      <input type="text" id="api-url" placeholder="Enter API URL" />
-      <input type="text" id="api-key" placeholder="Enter API Key or NO_API_KEY" />
+      <input type="text" id="api-url" placeholder="API URL (default: mail.tm)" />
+      <input type="text" id="api-key" placeholder="API Key or NO_API_KEY" />
+      <input type="number" id="char-length" min="4" max="32" value="8" />
+      <label for="char-length">Char Length</label>
     </div>
 
     <div class="email-box">
       <input type="text" id="email" readonly />
       <button id="copy">Copy</button>
-      <button id="generate">Generate Email</button>
+      <button id="generate">Generate</button>
       <button id="reset">Reset Timer</button>
-      <button id="extend">+30 Min</button>
-      <button id="destroy">Delete Session</button>
+      <button id="extend">+30min</button>
+      <button id="destroy">Delete</button>
+    </div>
+
+    <div class="timer">
+      Time left: <span id="timer">10:00</span>
     </div>
 
     <div class="inbox">
       <h2>Inbox</h2>
-      <button id="refresh">Refresh Inbox</button>
+      <button id="refresh">Refresh</button>
       <div id="emails"></div>
       <div id="emailContent"></div>
     </div>
