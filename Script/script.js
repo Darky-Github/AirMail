@@ -1,144 +1,112 @@
-let apiBase = "";
-let apiKey = "";
-let token = "";
 let email = "";
-let password = "";
-let userId = "";
-let timer = 600;
-let timerInterval;
-
-function generateRandom(length = 10) {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-}
-
-function setupAPI() {
-  apiBase = document.getElementById("apiBase").value;
-  apiKey = document.getElementById("apiKey").value;
-  destroySession(); // Clear any existing session
-  startSession();
-}
-
-async function startSession() {
-  if (apiBase.includes("mail.tm")) {
-    const domain = await (await fetch(`${apiBase}/domains`)).json();
-    const domainName = domain["hydra:member"][0].domain;
-    email = `${generateRandom()}@${domainName}`;
-    password = generateRandom(12);
-
-    // Create account
-    const reg = await fetch(`${apiBase}/accounts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ address: email, password }),
-    }).catch(() => {});
-
-    if (reg?.status === 201) {
-      const regData = await reg.json();
-      userId = regData.id;
-    }
-
-    // Login
-    const login = await fetch(`${apiBase}/token`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ address: email, password }),
-    });
-
-    const loginData = await login.json();
-    token = loginData.token;
-
-    document.getElementById("emailDisplay").textContent = email;
-    startTimer();
-    refreshInbox();
-  } else {
-    alert("Only Mail.tm supported for session deletion.");
-  }
-}
+let domain = "";
+let timer;
+let remaining = 600;
 
 function startTimer() {
-  timer = 600;
-  clearInterval(timerInterval);
-  timerInterval = setInterval(() => {
-    timer--;
-    if (timer <= 0) {
-      document.getElementById("timer").textContent = "Expired";
-      clearInterval(timerInterval);
+  clearInterval(timer);
+  timer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
       destroySession();
-    } else {
-      const m = Math.floor(timer / 60).toString().padStart(2, '0');
-      const s = (timer % 60).toString().padStart(2, '0');
-      document.getElementById("timer").textContent = `Timer: ${m}:${s}`;
+      clearInterval(timer);
     }
   }, 1000);
 }
 
-function resetTimer() {
-  timer = 600;
+function updateEmailField() {
+  document.getElementById("email").value = `${email}@${domain}`;
 }
 
-function extendTimer() {
-  timer += 1800; // +30 min
+function destroySession() {
+  email = "";
+  domain = "";
+  document.getElementById("email").value = "";
+  document.getElementById("emails").innerHTML = "";
+  document.getElementById("emailContent").innerHTML = "";
+  remaining = 600;
+  clearInterval(timer);
+}
+
+function generateEmail() {
+  const chars = "abcdefghijklmnopqrstuvwxyz1234567890";
+  email = "";
+  for (let i = 0; i < 8; i++) {
+    email += chars[Math.floor(Math.random() * chars.length)];
+  }
+  domain = "1secmail.com"; // or adjust as needed
+  updateEmailField();
+  remaining = 600;
+  startTimer();
+  fetchInbox();
 }
 
 function copyEmail() {
-  if (email)
-    navigator.clipboard.writeText(email).then(() => alert("Email copied to clipboard!"));
+  const input = document.getElementById("email");
+  input.select();
+  document.execCommand("copy");
 }
 
-async function refreshInbox() {
-  if (!token || !apiBase.includes("mail.tm")) return;
-
-  const res = await fetch(`${apiBase}/messages`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await res.json();
-  const emailsDiv = document.getElementById("emails");
-  emailsDiv.innerHTML = "";
-
-  data["hydra:member"].forEach(msg => {
-    const div = document.createElement("div");
-    div.className = "email";
-    div.textContent = `📧 ${msg.from.address} - ${msg.subject}`;
-    div.onclick = () => loadEmail(msg.id);
-    emailsDiv.appendChild(div);
-  });
+function resetTimer() {
+  remaining = 600;
 }
 
-async function loadEmail(id) {
-  const res = await fetch(`${apiBase}/messages/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const data = await res.json();
-  const contentDiv = document.getElementById("emailContent");
-  contentDiv.innerHTML = `
-    <h3>${data.subject}</h3>
-    <p><strong>From:</strong> ${data.from.address}</p>
-    <p>${data.text}</p>
-  `;
+function extendTimer() {
+  remaining += 1800;
 }
 
-async function destroySession() {
-  clearInterval(timerInterval);
-  document.getElementById("emailDisplay").textContent = "-";
-  document.getElementById("timer").textContent = "Expired";
-  document.getElementById("emails").innerHTML = "";
-  document.getElementById("emailContent").innerHTML = "";
+function fetchInbox() {
+  if (!email || !domain) return;
+  const apiUrl = document.getElementById("api-url").value.trim();
+  const apiKey = document.getElementById("api-key").value.trim();
+  const fullUrl = `${apiUrl}?action=getMessages&login=${email}&domain=${domain}`;
 
-  if (token && userId && apiBase.includes("mail.tm")) {
-    await fetch(`${apiBase}/accounts/${userId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).catch(() => {});
-  }
-
-  token = "";
-  email = "";
-  password = "";
-  userId = "";
+  fetch(fullUrl, {
+    headers: apiKey !== "NO_API_KEY" ? { "Authorization": `Bearer ${apiKey}` } : {}
+  })
+    .then(res => res.json())
+    .then(data => {
+      const inbox = document.getElementById("emails");
+      inbox.innerHTML = "";
+      if (!Array.isArray(data)) return;
+      data.forEach(msg => {
+        const div = document.createElement("div");
+        div.className = "email";
+        div.innerText = `${msg.from}: ${msg.subject}`;
+        div.onclick = () => loadMessage(msg.id);
+        inbox.appendChild(div);
+      });
+    })
+    .catch(() => {
+      document.getElementById("emails").innerHTML = "Error loading inbox.";
+    });
 }
 
-// Cleanup when page is closed or reloaded
-window.addEventListener("beforeunload", destroySession);
+function loadMessage(id) {
+  const apiUrl = document.getElementById("api-url").value.trim();
+  const apiKey = document.getElementById("api-key").value.trim();
+  const fullUrl = `${apiUrl}?action=readMessage&login=${email}&domain=${domain}&id=${id}`;
+
+  fetch(fullUrl, {
+    headers: apiKey !== "NO_API_KEY" ? { "Authorization": `Bearer ${apiKey}` } : {}
+  })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("emailContent").innerHTML = `
+        <strong>From:</strong> ${data.from}<br />
+        <strong>Subject:</strong> ${data.subject}<br />
+        <strong>Date:</strong> ${data.date}<br /><br />
+        <div>${data.body}</div>
+      `;
+    })
+    .catch(() => {
+      document.getElementById("emailContent").innerHTML = "Error loading message.";
+    });
+}
+
+document.getElementById("copy").onclick = copyEmail;
+document.getElementById("generate").onclick = generateEmail;
+document.getElementById("reset").onclick = resetTimer;
+document.getElementById("extend").onclick = extendTimer;
+document.getElementById("destroy").onclick = destroySession;
+document.getElementById("refresh").onclick = fetchInbox;
