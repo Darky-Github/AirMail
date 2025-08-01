@@ -1,10 +1,10 @@
 body {
   font-family: sans-serif;
   background: #121212;
-  color: #e0e0e0;
   margin: 0;
   padding: 0;
   text-align: center;
+  transition: background 0.3s;
 }
 
 .container {
@@ -12,28 +12,27 @@ body {
   max-width: 600px;
   padding: 20px;
   background: #1e1e1e;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
   border-radius: 10px;
   margin-top: 40px;
 }
 
-h1 {
-  color: #ffffff;
+h1, h2 {
+  color: #ccc;
 }
 
 .email-box,
-.config {
+.inbox {
   margin-top: 20px;
 }
 
-input[type="text"] {
+input[type="text"], input[type="number"], select {
   width: 70%;
   padding: 10px;
   margin: 5px 0;
-  background: #2c2c2c;
-  color: #f0f0f0;
+  background: #222;
+  color: white;
   border: 1px solid #444;
-  border-radius: 5px;
 }
 
 button {
@@ -42,9 +41,8 @@ button {
   border: none;
   border-radius: 5px;
   background-color: #333;
-  color: #fff;
+  color: white;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 
 button:hover {
@@ -60,9 +58,6 @@ button:hover {
   padding: 10px;
   border-bottom: 1px solid #333;
   cursor: pointer;
-  background-color: #1a1a1a;
-  color: #e0e0e0;
-  transition: background 0.2s ease;
 }
 
 .email:hover {
@@ -72,15 +67,44 @@ button:hover {
 #emailContent {
   margin-top: 20px;
   text-align: left;
-  background-color: #1a1a1a;
+  background: #1c1c1c;
   padding: 10px;
   border-radius: 5px;
-  color: #d0d0d0;
+  color: white;
 }
 
 footer {
   text-align: center;
   margin-top: 50px;
   font-size: 14px;
-  color: #777;
+  color: #aaa;
+}
+
+#settings-icon {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+  font-size: 24px;
+  color: white;
+}
+
+#settings-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  background: #1e1e1e;
+  color: white;
+  padding: 20px;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+#settings-panel.open {
+  transform: translateX(0);
 }
