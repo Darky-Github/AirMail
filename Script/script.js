@@ -37,7 +37,7 @@ async function generateEmail() {
   destroySession();
   const len = parseInt(document.getElementById("char-length").value) || 8;
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  const local = Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  const local = Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
   password = Math.random().toString(36).slice(2, 12);
 
   const domains = await fetch(`${API}/domains`).then(res => res.json());
@@ -45,14 +45,12 @@ async function generateEmail() {
   email = `${local}@${domain}`;
   emailInput.value = email;
 
-  // Register
   await fetch(`${API}/accounts`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ address: email, password })
   });
 
-  // Login
   const loginRes = await fetch(`${API}/token`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -61,7 +59,6 @@ async function generateEmail() {
   const loginData = await loginRes.json();
   token = loginData.token;
 
-  // Get user ID
   const userRes = await fetch(`${API}/me`, {
     headers: { Authorization: `Bearer ${token}` }
   });
@@ -103,6 +100,44 @@ async function loadEmail(id) {
   `;
 }
 
+// Send Email
+document.getElementById("send").onclick = async () => {
+  const apiUrl = document.getElementById("custom-api").value.trim();
+  const apiKey = document.getElementById("api-key").value.trim();
+  const to = document.getElementById("to-email").value.trim();
+  const subject = document.getElementById("subject").value.trim();
+  const message = document.getElementById("message").value.trim();
+  const status = document.getElementById("send-status");
+
+  if (!apiUrl || !to || !subject || !message) {
+    status.textContent = "Please fill all fields and provide API.";
+    return;
+  }
+
+  status.textContent = "Sending...";
+
+  try {
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(apiKey !== "NO_API_KEY" && { "Authorization": apiKey })
+      },
+      body: JSON.stringify({ to, subject, message })
+    });
+
+    if (res.ok) {
+      status.textContent = "✅ Email sent successfully!";
+    } else {
+      const err = await res.text();
+      status.textContent = `❌ Failed to send: ${err}`;
+    }
+  } catch (err) {
+    status.textContent = `❌ Error: ${err.message}`;
+  }
+};
+
+// Event bindings
 document.getElementById("generate").onclick = generateEmail;
 document.getElementById("copy").onclick = () => {
   emailInput.select();
