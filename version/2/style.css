@@ -1,1 +1,106 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #121212;
+  font-family: Arial, sans-serif;
+  color: #eee;
+  text-align: center;
+}
+
+.container {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #1a1a1a;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+
+h1, h2 {
+  margin: 10px 0;
+  color: #fafafa;
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+  width: 80%;
+  padding: 10px;
+  margin: 5px 0;
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 5px;
+}
+
+textarea {
+  resize: vertical;
+  height: 100px;
+}
+
+button {
+  padding: 10px 12px;
+  margin: 5px 4px;
+  border: none;
+  border-radius: 5px;
+  background: #444;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #666;
+}
+
+.timer {
+  margin: 15px 0;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.email {
+  padding: 10px;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  text-align: left;
+}
+
+.email:hover {
+  background: #222;
+}
+
+#emailContent {
+  text-align: left;
+  background: #1e1e1e;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.send-email {
+  margin-top: 20px;
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+#send-status {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #ccc;
+}
+
+footer {
+  margin-top: 40px;
+  font-size: 13px;
+  color: #777;
+}
+
+@media (max-width: 600px) {
+  input, button, textarea {
+    width: 90%;
+    margin: 5px auto;
+  }
+}
 
