@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AirMail</title>
+  <meta name="keywords" content="temporary email, tempmail, disposable, airmail" />
+  <meta name="description" content="AirMail - Lightweight temporary email frontend with Mail.tm support." />
+  <meta name="author" content="Darky-Github" />
+  <link rel="stylesheet" href="Style/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>AirMail</h1>
 
+    <div class="config">
+      <label>Char Length</label>
+      <input type="number" id="char-length" min="4" max="32" value="8" />
+
+      <label>Custom API</label>
+      <input type="text" id="custom-api" placeholder="https://your.api/send" />
+
+      <label>API Key</label>
+      <input type="text" id="api-key" placeholder="NO_API_KEY" />
+    </div>
+
+    <div class="email-box">
+      <input type="text" id="email" readonly />
+      <button id="copy">Copy</button>
+      <button id="generate">Generate</button>
+      <button id="reset">Reset Timer</button>
+      <button id="extend">+30min</button>
+      <button id="destroy">Delete</button>
+    </div>
+
+    <div class="timer">
+      Time left: <span id="timer">10:00</span>
+    </div>
+
+    <div class="inbox">
+      <h2>Inbox</h2>
+      <button id="refresh">Refresh</button>
+      <div id="emails"></div>
+      <div id="emailContent"></div>
+    </div>
+
+    <div class="send-email">
+      <h2>Send Email</h2>
+      <input type="text" id="to-email" placeholder="To Email" />
+      <input type="text" id="subject" placeholder="Subject" />
+      <textarea id="message" placeholder="Message..."></textarea>
+      <button id="send">Send</button>
+      <div id="send-status"></div>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Darky-Github. All rights reserved.
+  </footer>
+
+  <script src="Script/script.js"></script>
+</body>
+</html>
