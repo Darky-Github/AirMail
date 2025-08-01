@@ -1,6 +1,7 @@
 body {
   font-family: sans-serif;
   background: #121212;
+  color: white;
   margin: 0;
   padding: 0;
   text-align: center;
@@ -26,7 +27,9 @@ h1, h2 {
   margin-top: 20px;
 }
 
-input[type="text"], input[type="number"], select {
+input[type="text"],
+input[type="number"],
+select {
   width: 70%;
   padding: 10px;
   margin: 5px 0;
@@ -70,7 +73,6 @@ button:hover {
   background: #1c1c1c;
   padding: 10px;
   border-radius: 5px;
-  color: white;
 }
 
 footer {
@@ -87,24 +89,35 @@ footer {
   cursor: pointer;
   font-size: 24px;
   color: white;
+  z-index: 1001;
 }
 
-#settings-panel {
+/* Overlay and modal styles */
+#overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 300px;
-  background: #1e1e1e;
-  color: white;
-  padding: 20px;
-  height: 100vh;
-  overflow-y: auto;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
   z-index: 1000;
 }
 
-#settings-panel.open {
-  transform: translateX(0);
+#settings-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  max-width: 400px;
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 10px;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  text-align: left;
+}
+
+.hidden {
+  display: none;
 }
