@@ -22,7 +22,8 @@ h1, h2 {
 }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+textarea {
   width: 80%;
   padding: 10px;
   margin: 5px 0;
@@ -30,6 +31,11 @@ input[type="number"] {
   color: #fff;
   border: 1px solid #444;
   border-radius: 5px;
+}
+
+textarea {
+  resize: vertical;
+  height: 100px;
 }
 
 button {
@@ -72,6 +78,19 @@ button:hover {
   border-radius: 5px;
 }
 
+.send-email {
+  margin-top: 20px;
+  background: #1a1a1a;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+#send-status {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #ccc;
+}
+
 footer {
   margin-top: 40px;
   font-size: 13px;
@@ -79,7 +98,7 @@ footer {
 }
 
 @media (max-width: 600px) {
-  input, button {
+  input, button, textarea {
     width: 90%;
     margin: 5px auto;
   }
