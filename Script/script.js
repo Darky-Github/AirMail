@@ -1,8 +1,8 @@
-let email = "", domain = "mail.tm", token = "", timerInterval;
-let remaining = 600;
+let email = "", password = "", token = "", userId = "", timer = 600, timerInterval = null;
+const API = "https://api.mail.tm";
 
-const emailBox = document.getElementById("email");
-const timerText = document.getElementById("timer");
+const emailInput = document.getElementById("email");
+const timerDisplay = document.getElementById("timer");
 
 function formatTime(sec) {
   const m = Math.floor(sec / 60).toString().padStart(2, '0');
@@ -10,13 +10,13 @@ function formatTime(sec) {
   return `${m}:${s}`;
 }
 
-function startTimer() {
+function updateTimer() {
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
-    remaining--;
-    timerText.textContent = formatTime(remaining);
-    document.title = `(${formatTime(remaining)}) AirMail`;
-    if (remaining <= 0) {
+    timer--;
+    timerDisplay.textContent = formatTime(timer);
+    document.title = `(${formatTime(timer)}) AirMail`;
+    if (timer <= 0) {
       clearInterval(timerInterval);
       destroySession();
     }
@@ -24,70 +24,91 @@ function startTimer() {
 }
 
 function destroySession() {
-  email = "";
-  token = "";
-  emailBox.value = "";
+  clearInterval(timerInterval);
+  email = token = password = userId = "";
+  emailInput.value = "";
+  timerDisplay.textContent = "00:00";
+  document.title = "AirMail";
   document.getElementById("emails").innerHTML = "";
   document.getElementById("emailContent").innerHTML = "";
-  timerText.textContent = "00:00";
-  document.title = "AirMail";
 }
 
-function generateEmail() {
+async function generateEmail() {
+  destroySession();
   const len = parseInt(document.getElementById("char-length").value) || 8;
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  email = Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-  emailBox.value = email + "@mail.tm";
-  remaining = 600;
-  timerText.textContent = formatTime(remaining);
-  startTimer();
+  const local = Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  password = Math.random().toString(36).slice(2, 12);
+
+  const domains = await fetch(`${API}/domains`).then(res => res.json());
+  const domain = domains["hydra:member"][0].domain;
+  email = `${local}@${domain}`;
+  emailInput.value = email;
+
+  // Register
+  await fetch(`${API}/accounts`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ address: email, password })
+  });
+
+  // Login
+  const loginRes = await fetch(`${API}/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ address: email, password })
+  });
+  const loginData = await loginRes.json();
+  token = loginData.token;
+
+  // Get user ID
+  const userRes = await fetch(`${API}/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const userData = await userRes.json();
+  userId = userData.id;
+
+  timer = 600;
+  updateTimer();
   fetchInbox();
 }
 
-function fetchInbox() {
-  const api = document.getElementById("api-url").value || "https://api.mail.tm";
-  const key = document.getElementById("api-key").value || "NO_API_KEY";
+async function fetchInbox() {
+  if (!token) return;
   const inbox = document.getElementById("emails");
   inbox.innerHTML = "Loading...";
-
-  // This is just placeholder logic; actual Mail.tm needs account creation + token
-  fetch(`${api}/messages`, {
-    headers: key !== "NO_API_KEY" ? { Authorization: `Bearer ${key}` } : {}
-  })
-  .then(res => res.json())
-  .then(data => {
-    inbox.innerHTML = "";
-    (data || []).forEach(msg => {
-      const div = document.createElement("div");
-      div.className = "email";
-      div.textContent = `${msg.from.address} — ${msg.subject}`;
-      div.onclick = () => loadEmail(api, msg.id, key);
-      inbox.appendChild(div);
-    });
-  }).catch(() => inbox.innerHTML = "Inbox fetch error");
-}
-
-function loadEmail(api, id, key) {
-  fetch(`${api}/messages/${id}`, {
-    headers: key !== "NO_API_KEY" ? { Authorization: `Bearer ${key}` } : {}
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("emailContent").innerHTML = `
-      <b>From:</b> ${data.from.address}<br/>
-      <b>Subject:</b> ${data.subject}<br/>
-      <b>Date:</b> ${data.intro}<br/><hr/>
-      ${data.text || data.html}
-    `;
+  const res = await fetch(`${API}/messages`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const data = await res.json();
+  inbox.innerHTML = "";
+  data["hydra:member"].forEach(msg => {
+    const div = document.createElement("div");
+    div.className = "email";
+    div.textContent = `${msg.from.address} — ${msg.subject}`;
+    div.onclick = () => loadEmail(msg.id);
+    inbox.appendChild(div);
   });
 }
 
+async function loadEmail(id) {
+  const res = await fetch(`${API}/messages/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  const msg = await res.json();
+  document.getElementById("emailContent").innerHTML = `
+    <b>From:</b> ${msg.from.address}<br/>
+    <b>Subject:</b> ${msg.subject}<br/>
+    <b>Text:</b><br/>${msg.text || msg.html || "No content"}
+  `;
+}
+
 document.getElementById("generate").onclick = generateEmail;
-document.getElementById("reset").onclick = () => remaining = 600;
-document.getElementById("extend").onclick = () => remaining += 1800;
-document.getElementById("destroy").onclick = destroySession;
 document.getElementById("copy").onclick = () => {
-  emailBox.select();
+  emailInput.select();
   document.execCommand("copy");
 };
+document.getElementById("reset").onclick = () => timer = 600;
+document.getElementById("extend").onclick = () => timer += 1800;
+document.getElementById("destroy").onclick = destroySession;
 document.getElementById("refresh").onclick = fetchInbox;
