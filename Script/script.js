@@ -1,12 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
   const settingsIcon = document.getElementById("settings-icon");
-  const settingsPanel = document.getElementById("settings-panel");
+  const settingsModal = document.getElementById("settings-modal");
+  const overlay = document.getElementById("overlay");
+  const closeSettings = document.getElementById("close-settings");
+
+  // Show settings modal
+  settingsIcon.addEventListener("click", () => {
+    settingsModal.classList.remove("hidden");
+    overlay.classList.remove("hidden");
+  });
+
+  // Hide settings modal
+  closeSettings.addEventListener("click", () => {
+    settingsModal.classList.add("hidden");
+    overlay.classList.add("hidden");
+  });
+
   const themeSelector = document.getElementById("theme-selector");
   const fontSizeSlider = document.getElementById("font-size");
-
-  settingsIcon.addEventListener("click", () => {
-    settingsPanel.classList.toggle("open");
-  });
 
   themeSelector.addEventListener("change", () => {
     document.body.className = themeSelector.value;
@@ -30,8 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fontSizeSlider.value = savedFontSize;
   }
 
-  const exportBtn = document.getElementById("export-inbox");
-  exportBtn.addEventListener("click", () => {
+  document.getElementById("export-inbox").addEventListener("click", () => {
     const emails = document.getElementById("emails").innerText;
     const blob = new Blob([emails], { type: "text/plain" });
     const a = document.createElement("a");
@@ -39,8 +49,4 @@ document.addEventListener("DOMContentLoaded", () => {
     a.download = "inbox.txt";
     a.click();
   });
-
-  setInterval(() => {
-    document.title = `[00:00] AirMail`; // Replace with actual countdown logic
-  }, 1000);
 });
