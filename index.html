@@ -3,36 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="author" content="Darky-Github">
-  <meta name="description" content="AirMail - A temporary email generator with custom API support.">
-  <meta name="keywords" content="temporary email, temp mail, disposable email, API, AirMail, Darky, hacking tools">
   <title>AirMail</title>
-  <link rel="stylesheet" href="Style/style.css">
+  <meta name="keywords" content="temporary email, airmail, tempmail, disposable email, privacy" />
+  <meta name="description" content="AirMail - Fast, lightweight temporary email frontend." />
+  <meta name="author" content="Darky-Github" />
+  <link rel="stylesheet" href="Style/style.css" />
 </head>
 <body>
   <div class="container">
     <h1>AirMail</h1>
 
     <div class="config">
-      <input type="text" id="apiBase" placeholder="API Base URL" />
-      <input type="text" id="apiKey" placeholder="API Key (or NO_API_KEY)" />
-      <button onclick="setupAPI()">Set API</button>
+      <input type="text" id="api-url" placeholder="Enter API URL" />
+      <input type="text" id="api-key" placeholder="Enter API Key or NO_API_KEY" />
     </div>
 
     <div class="email-box">
-      <p><strong>Email:</strong> <span id="emailDisplay">-</span></p>
-      <button onclick="copyEmail()">Copy</button>
-      <button onclick="resetTimer()">Reset Timer</button>
-      <button onclick="extendTimer()">+30 Min</button>
-      <button onclick="destroySession()">Destroy Session</button>
-      <p id="timer">Timer: 10:00</p>
+      <input type="text" id="email" readonly />
+      <button id="copy">Copy</button>
+      <button id="generate">Generate Email</button>
+      <button id="reset">Reset Timer</button>
+      <button id="extend">+30 Min</button>
+      <button id="destroy">Delete Session</button>
     </div>
 
-
-    <button onclick="refreshInbox()">Refresh Inbox</button>
-
-    <div id="emails"></div>
-    <div id="emailContent"></div>
+    <div class="inbox">
+      <h2>Inbox</h2>
+      <button id="refresh">Refresh Inbox</button>
+      <div id="emails"></div>
+      <div id="emailContent"></div>
+    </div>
   </div>
 
   <footer>
