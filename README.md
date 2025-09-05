@@ -4,6 +4,8 @@ AirMail is a lightweight temporary email generator and inbox viewer built using 
 
 [AirMail](https://darky-github.github.io/AirMail/)
 
+[Donate here](https://github.com/Darky-Github/AirMail/blob/main/donate.md)
+
 ---
 
 ## Features
