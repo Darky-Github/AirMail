@@ -1,10 +1,10 @@
-# AirMail - Temporary Email
+# SoulMail - Temporary Email
 
-AirMail is a lightweight temporary email generator and inbox viewer built using pure HTML, CSS, and JavaScript. No backend. No database. Fully privacy-respecting and user-controlled.
+SoulMail is a lightweight temporary email generator and inbox viewer built using pure HTML, CSS, and JavaScript. No backend. No database. Fully privacy-respecting and user-controlled.
 
-[AirMail](https://darky-github.github.io/AirMail/)
+[SoulMail](https://darky-github.github.io/SoulMail/)
 
-[Donate here](https://github.com/Darky-Github/AirMail/blob/main/donate.md)
+[Donate here](https://github.com/Darky-Github/SoulMail/blob/main/donate.md)
 
 ---
 
@@ -35,7 +35,7 @@ AirMail is a lightweight temporary email generator and inbox viewer built using 
 
 ## How to Use
 
-1. **Open `index.html` in a browser (supports Chrome, Firefox, Edge, Brave, etc.)**
+1. **Open `index.html` in a browser (supports all browsers)**
 2. **Enter API Details:**
 
 | Field         | Example                        |
@@ -71,7 +71,7 @@ AirMail is a lightweight temporary email generator and inbox viewer built using 
 
 ---
 
-## Pro Tips
+## Tips
 
 - Extend your session using the "+30 Min" button if you're still using the email
 - Use "Destroy Session" to manually nuke everything
